@@ -1,125 +1,400 @@
-# SpanFootballStandings-
 # SPAN Football Standings Calculator
 
 A C#/.NET command-line application developed for the SPAN Digital Associate Software Engineer coding assessment.
 
-The application reads historical football match results from a CSV file, calculates league standings, applies historical ranking rules, and exports the ranked table to another CSV file.
+The application reads historical football match results from a CSV file, calculates league standings using the historical ranking rules, and exports the completed league table to another CSV file.
 
-## Technology
+The primary objective is to calculate the English First Division standings at the end of week 10 of the 1974/75 season.
 
-- C# and .NET 9
-- CsvHelper 33.1.0
-- xUnit for automated testing
-- Git for version control
+## Technology Stack
+
+- **Language:** C#
+- **Framework:** .NET 9
+- **CSV Processing:** CsvHelper 33.1.0
+- **Testing:** xUnit
+- **Version Control:** Git and GitHub
+- **Development Environments:** Windows and macOS
+- **IDE:** Visual Studio Code
 
 ## Requirements
 
-Install the .NET 9 SDK on Windows, macOS or Linux.
+The application requires the .NET 9 SDK.
 
-The application is written using cross-platform .NET APIs. Development and local testing were performed on Windows. Native macOS execution has not yet been verified.
+Download: https://dotnet.microsoft.com/en-us/download/dotnet/9.0
 
-No database, API keys or external services are required to run the application.
+Verify the installation using:
 
-## Building the application
+`dotnet --version`
 
-From the repository root:
+The application is cross-platform and has been successfully built and tested on both Windows and macOS.
 
-1. Restore dependencies: `dotnet restore`
-2. Build the solution: `dotnet build`
-3. Run the tests: `dotnet test`
+No database, API keys, external services or additional application servers are required to run the application. NuGet packages are restored during the build process.
 
-NuGet dependencies are restored automatically.
+## Getting Started
 
-## Running the application
+### 1. Clone the Repository
 
-Run the application with an input CSV path followed by an output CSV path:
+Open a terminal and run:
 
-`dotnet run --project src/FootballStandings -- data/1974-75-week10-results.csv data/1974-75-week10-standings.csv`
+`git clone https://github.com/TashreeqPhipps/SpanFootballStandings-.git`
 
-The application reports the number of matches processed, the number of teams ranked and the location of the generated CSV.
+Navigate into the project:
 
-### Input format
+`cd SpanFootballStandings-`
 
-The required columns are:
+All subsequent commands should be executed from the repository's root directory.
+
+### 2. Restore Dependencies
+
+`dotnet restore`
+
+This downloads the required NuGet dependencies.
+
+### 3. Build the Application
+
+`dotnet build -c Release`
+
+The application and test project should build successfully without errors.
+
+### 4. Run Automated Tests
+
+`dotnet test -c Release`
+
+**Latest verified result:**
+
+- Total tests: 61
+- Passed: 61
+- Failed: 0
+- Skipped: 0
+
+All 61 tests passed on both Windows and macOS during development.
+
+## Running the Football Standings Application
+
+The application accepts two command-line arguments:
+
+1. The path to the input CSV containing match results.
+2. The path where the calculated standings CSV should be saved.
+
+### Run on Windows
+
+Open PowerShell or the VS Code integrated terminal from the project directory.
+
+Execute:
+
+`dotnet run --project .\src\FootballStandings -c Release -- .\data\1974-75-week10-results.csv .\data\1974-75-week10-standings.csv`
+
+The application processes the historical matches and generates the standings CSV.
+
+**Expected output:**
+
+```text
+Standings calculated successfully.
+Matches processed: 107
+Teams ranked: 22
+Output file: [absolute path to output CSV]
+```
+
+The generated file is located at:
+
+`data/1974-75-week10-standings.csv`
+
+### Display the League Table on Windows
+
+Run the following PowerShell command:
+
+`Import-Csv .\data\1974-75-week10-standings.csv | Format-Table -AutoSize`
+
+This displays the complete 22-team league table in a readable column format in the PowerShell terminal.
+
+Expand the terminal window if the columns are too narrow.
+
+### Run on macOS
+
+Open Terminal or the VS Code integrated terminal and navigate to the project directory.
+
+Execute:
+
+`dotnet run --project src/FootballStandings -c Release -- data/1974-75-week10-results.csv data/1974-75-week10-standings.csv`
+
+**Expected output:**
+
+```text
+Standings calculated successfully.
+Matches processed: 107
+Teams ranked: 22
+Output file: [absolute path to output CSV]
+```
+
+### Display the League Table on macOS
+
+Run:
+
+`column -s, -t data/1974-75-week10-standings.csv`
+
+This displays the complete historical standings table in the terminal.
+
+The `-s,` argument specifies the CSV comma delimiter, while `-t` formats the results into aligned columns.
+
+The output includes all 22 teams, their match statistics and league positions.
+
+**Important:** The C# application itself produces the standings CSV and displays a processing summary. The PowerShell `Import-Csv` and macOS `column` commands are separate terminal utilities used to display the generated CSV as a table. No additional C# implementation is needed to view the table.
+
+## Expected Historical Results
+
+The application processes 107 match results and generates standings for all 22 English First Division clubs.
+
+The top five calculated positions are:
+
+| Position | Team | Played | Points |
+|---|---|---|---|
+| 1 | Ipswich Town | 10 | 16 |
+| 2 | Manchester City | 10 | 14 |
+| 3 | Liverpool | 10 | 13 |
+| 4 | Everton | 10 | 13 |
+| 5 | Sheffield United | 10 | 13 |
+
+The complete table contains statistics for every participating team.
+
+## CSV Input Format
+
+The application expects a CSV containing these columns:
 
 `Date,HomeTeam,AwayTeam,HomeGoals,AwayGoals`
 
-Each row represents one completed match. Dates use `yyyy-MM-dd` formatting, and scores must be nonnegative integers.
+Example:
 
-The CSV reader validates the input, including required headers, malformed results, missing team names and duplicate fixtures.
+```csv
+Date,HomeTeam,AwayTeam,HomeGoals,AwayGoals
+1974-08-17,Sheffield United,QPR,1,1
+1974-08-17,Birmingham City,Middlesbrough,0,3
+1974-08-17,Everton,Derby County,0,0
+```
 
-### Output format
+Each row represents one completed football match.
 
-The generated CSV contains:
+Input validation covers required columns, valid dates, team names, goal values and duplicate fixture records.
+
+Dates use the `yyyy-MM-dd` format, and goal values must be nonnegative integers.
+
+## CSV Output Format
+
+The application generates the following columns:
 
 `Position,Team,Played,Won,Drawn,Lost,GoalsFor,GoalsAgainst,GoalAverage,Points`
 
-The output is sorted according to the implemented historical ranking rules.
+Example:
 
-## Historical football rules
+```csv
+Position,Team,Played,Won,Drawn,Lost,GoalsFor,GoalsAgainst,GoalAverage,Points
+1,Ipswich Town,10,8,0,2,18,6,3.000,16
+2,Manchester City,10,6,2,2,14,11,1.273,14
+3,Liverpool,10,6,1,3,17,8,2.125,13
+```
 
-The 1974/75 English First Division used the following points system:
+The output represents the ranked league table, with statistics accumulated from the input match results.
 
-- Win: 2 points
-- Draw: 1 point
-- Loss: 0 points
+## Historical Football Rules
 
-Teams are ranked primarily by points, followed by goal average and goals scored.
+The application follows the points system used in the English First Division during the 1974/75 season.
 
-Goal average is calculated as goals scored divided by goals conceded, rather than using modern goal difference.
+| Result | Points |
+|---|---|
+| Win | 2 |
+| Draw | 1 |
+| Loss | 0 |
 
-Ratios are compared without rounding. Three-decimal formatting is used only in the exported CSV.
+Unlike modern Premier League standings, teams were historically separated by goal average rather than goal difference.
 
-### Edge cases and assumptions
+**Goal average formula:**
 
-The implementation treats a positive number of goals scored with zero conceded as an infinite goal average. Zero goals scored and zero conceded are represented as an average of 1.
+Goal Average = Goals For / Goals Against
 
-These exceptional cases follow documented implementation conventions rather than independently verified historical Football League regulations.
+The implemented ranking criteria are:
 
-Remaining ties use a deterministic alphabetical fallback. This is not claimed to be an official historical tie-breaker; historical head-to-head resolution remains an area for final review.
+1. Total points, highest first.
+2. Goal average, highest first.
+3. Goals scored, highest first.
+4. Alphabetical ordering as a deterministic fallback for unresolved ties.
 
-## Historical dataset
+The application compares goal-average ratios without rounding to preserve accuracy. Three-decimal formatting is applied when exporting the standings CSV.
 
-The supplied dataset covers English First Division matches played from 17 August through 28 September 1974, the completion of the tenth listed matchweek.
+### Historical Rule Assumptions
 
-It contains:
+The implementation treats a positive number of goals scored with zero goals conceded as an infinite goal average.
+
+A team with zero goals scored and zero conceded is assigned a goal average of 1.
+
+These exceptional cases are implementation conventions and are not claimed to be independently verified official 1974/75 Football League regulations.
+
+The final alphabetical fallback is also an implementation decision rather than an official historical tie-breaker.
+
+## Historical Dataset and Sources
+
+The historical dataset represents completed English First Division fixtures from 17 August 1974 through 28 September 1974, corresponding to the first ten matchweeks in the source's fixture schedule.
+
+The dataset includes:
 
 - 107 completed matches
-- 22 participating teams
-- 16 teams with 10 matches played and 6 teams with 9 matches played
+- 22 participating clubs
+- 16 clubs with 10 matches played
+- 6 clubs with 9 matches played
 
-Source: [Sports Reference / FBref — 1974/75 First Division Scores & Fixtures](https://fbref.com/en/comps/9/1974-1975/schedule/1974-1975-Premier-League-Scores-and-Fixtures).
+### Primary Data Source
 
-The input was converted from the source's fixture and score format into the five-column format expected by the application.
+[FBref / Sports Reference — 1974/75 First Division Scores & Fixtures](https://fbref.com/en/comps/9/1974-1975/schedule/1974-1975-Premier-League-Scores-and-Fixtures)
 
-The generated standings were also cross-checked against historical records. One reference differs in its ordering of Arsenal and Tottenham; the implementation places Arsenal above Tottenham on goal average. This discrepancy is retained as a documented verification note.
+The source's fixture dates, teams and match scores were converted into the five-column CSV format used by this application.
 
-## Project structure
+The original matchweek labels were used to identify the appropriate fixture period. The application processes the supplied completed matches rather than interpreting matchweek labels itself.
 
-- `src/FootballStandings/Models/` — match results and team standing models
-- `src/FootballStandings/Services/` — standings aggregation and historical ranking
-- `src/FootballStandings/Csv/` — CSV reading and writing
-- `src/FootballStandings/Program.cs` — command-line entry point and application coordination
-- `tests/FootballStandings.Tests/` — unit and integration tests
-- `data/` — historical results, expected output and illustrative sample files
-- `ai/` — AI collaboration records, to be finalized
+### Historical Verification
 
-## Testing
+The results were cross-checked against:
 
-Run all tests with:
+[LFChistory — Sheffield United vs Liverpool, 28 September 1974](https://www.lfchistory.net/games/818)
 
-`dotnet test`
+The historical reference agrees with the calculated match statistics and the first 19 league positions.
 
-At the latest verified development milestone, 61 tests passed on Windows, including a historical integration test.
+One discrepancy exists in the ordering of Arsenal and Tottenham. The reference places Tottenham above Arsenal, while the application places Arsenal higher because its goal average is 0.750 compared with Tottenham's approximately 0.733.
 
-The tests cover match validation, statistics calculations, historical ranking, CSV handling, error cases and processing the supplied 107-match dataset.
+The application retains the ordering consistent with its documented goal-average calculation.
 
-## AI collaboration
+## Application Architecture
 
-ChatGPT was used during requirements analysis, implementation, testing, debugging and technical review.
+The solution separates responsibilities into models, calculation services and CSV processing classes.
 
-Genuine collaboration evidence and the developer's reflection will be supplied separately as required by the assessment. No Claude Code session data is claimed to have been generated.
+### Models
 
-## Known limitations and final verification
+`src/FootballStandings/Models/MatchResult.cs`
 
-Before submission, the project requires final review of historical tie-breaking assumptions, additional command-line failure testing, confirmation of the AI artifact equivalence requirements and cross-platform execution validation.
+Represents an individual football match, including date, home and away teams, and final scores.
+
+`src/FootballStandings/Models/TeamStanding.cs`
+
+Maintains each team's accumulated league statistics, including matches played, wins, draws, losses, goals and points.
+
+### Services
+
+`src/FootballStandings/Services/StandingsCalculator.cs`
+
+Processes match results, updates the standings for both participating teams and produces the ranked league table.
+
+`src/FootballStandings/Services/HistoricalStandingsComparer.cs`
+
+Implements the historical points and goal-average comparison rules used to order the standings.
+
+### CSV Processing
+
+`src/FootballStandings/Csv/CsvMatchReader.cs`
+
+Reads and validates historical match data from CSV files.
+
+`src/FootballStandings/Csv/CsvStandingsWriter.cs`
+
+Writes the calculated league standings to an output CSV file.
+
+### Application Entry Point
+
+`src/FootballStandings/Program.cs`
+
+Handles command-line arguments and coordinates CSV reading, standings calculations and output generation.
+
+### Automated Tests
+
+`tests/FootballStandings.Tests/`
+
+Contains unit and integration tests for the application's components.
+
+The historical integration test verifies that the supplied match dataset produces the expected league standings.
+
+## Testing and Cross-Platform Verification
+
+The application was tested using .NET 9 on both Windows and macOS.
+
+| Verification | Windows | macOS |
+|---|---|---|
+| Dependency restoration | Passed | Passed |
+| Release build | Passed | Passed |
+| 61 automated tests | Passed | Passed |
+| Historical CSV processing | Passed | Passed |
+| 107 matches processed | Passed | Passed |
+| 22 teams ranked | Passed | Passed |
+| CSV output generation | Passed | Passed |
+
+### Output Consistency
+
+The standings CSV generated on macOS was compared against the committed output previously generated on Windows using:
+
+`diff -u data/1974-75-week10-standings.csv data/mac-standings.csv`
+
+The comparison returned exit code `0`, confirming that both files were identical.
+
+This verifies consistent historical standings output across the two tested operating systems.
+
+## Project Structure
+
+```text
+SpanFootballStandings-/
+├── .claude/
+│   └── README.md
+├── ai/
+│   └── README.md
+├── data/
+│   ├── 1974-75-week10-results.csv
+│   ├── 1974-75-week10-standings.csv
+│   ├── sample-results.csv
+│   └── sample-standings.csv
+├── src/
+│   └── FootballStandings/
+│       ├── Csv/
+│       ├── Models/
+│       ├── Services/
+│       ├── FootballStandings.csproj
+│       └── Program.cs
+├── tests/
+│   └── FootballStandings.Tests/
+├── .gitignore
+├── AI_REFLECTION.md
+├── CLAUDE.md
+├── README.md
+└── SpanFootballStandings.sln
+```
+
+## AI Collaboration
+
+OpenAI ChatGPT was used as a development assistant during requirements analysis, application design, implementation, debugging, automated testing, historical verification and documentation.
+
+The project was developed incrementally, with changes reviewed, tested and committed through Git.
+
+The repository includes:
+
+- `CLAUDE.md` — A retrospective record of the project instructions and development guidelines used with ChatGPT.
+- `AI_REFLECTION.md` — A reflection on the development process, engineering decisions and AI collaboration.
+- `ai/README.md` — AI collaboration evidence and a shared ChatGPT conversation link.
+- `.claude/README.md` — An explanation of the absence of native Claude Code session files.
+
+### ChatGPT Development Conversation
+
+[View the ChatGPT Development Conversation](https://chatgpt.com/share/6ad78201-66c0-83e9-afff-2869ae3ea626)
+
+ChatGPT was used instead of Claude Code. No Claude Code session files have been fabricated.
+
+The shared conversation link is provided as genuine collaboration evidence. A local export has been requested but is not yet included.
+
+Acceptance of this equivalent conversation evidence remains subject to confirmation by SPAN Digital.
+
+## Known Limitations and Assumptions
+
+- Historical zero-goal goal-average conventions are documented implementation choices.
+- Unresolved ranking ties use alphabetical ordering rather than a verified official historical tie-breaker.
+- The application calculates standings from completed matches supplied in the input CSV; it does not automatically download results or select fixtures by week.
+- The league table is exported to CSV. A terminal formatting utility is used when a human-readable display is desired.
+- The application has been verified on Windows and macOS. Linux execution has not been separately verified.
+- The remaining submission checks include command-line failure handling and confirmation that the supplied ChatGPT evidence is accepted as equivalent to the requested Claude Code artifacts.
+
+## Assessment
+
+Developed for the SPAN Digital Associate Software Engineer coding assessment.
+
+The project demonstrates C# application development, historical rules implementation, CSV processing, automated testing, separation of concerns, Git version control and responsible AI-assisted software engineering.
