@@ -111,4 +111,65 @@ public class StandingsCalculatorTests
         Assert.Throws<ArgumentNullException>(() =>
             _calculator.Calculate(null!));
     }
+
+    // HISTORICAL RANKING INTEGRATION TESTS
+
+    [Fact]
+    public void Calculate_HigherPoints_RanksFirst()
+    {
+        var matches = new[]
+        {
+            Match("Zulu", "Alpha", 1, 0)
+        };
+
+        var standings = _calculator.Calculate(matches);
+
+        Assert.Equal("Zulu", standings[0].TeamName);
+        Assert.Equal("Alpha", standings[1].TeamName);
+    }
+
+    [Fact]
+    public void Calculate_EqualPoints_UsesGoalAverage()
+    {
+        var matches = new[]
+        {
+            Match("Zulu", "Beta", 3, 1),
+            Match("Alpha", "Gamma", 2, 1)
+        };
+
+        var standings = _calculator.Calculate(matches);
+
+        Assert.Equal("Zulu", standings[0].TeamName);
+        Assert.Equal("Alpha", standings[1].TeamName);
+    }
+
+    [Fact]
+    public void Calculate_EqualGoalAverage_UsesGoalsScored()
+    {
+        var matches = new[]
+        {
+            Match("Zulu", "Beta", 4, 2),
+            Match("Alpha", "Gamma", 2, 1)
+        };
+
+        var standings = _calculator.Calculate(matches);
+
+        Assert.Equal("Zulu", standings[0].TeamName);
+        Assert.Equal("Alpha", standings[1].TeamName);
+    }
+
+    [Fact]
+    public void Calculate_ExactTie_UsesAlphabeticalFallback()
+    {
+        var matches = new[]
+        {
+            Match("Zulu", "Gamma", 2, 1),
+            Match("Alpha", "Beta", 2, 1)
+        };
+
+        var standings = _calculator.Calculate(matches);
+
+        Assert.Equal("Alpha", standings[0].TeamName);
+        Assert.Equal("Zulu", standings[1].TeamName);
+    }
 }
