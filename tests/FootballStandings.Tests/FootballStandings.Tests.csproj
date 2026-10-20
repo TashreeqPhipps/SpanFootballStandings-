@@ -1,4 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -20,6 +21,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\FootballStandings\FootballStandings.csproj" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Content Include="../../data/1974-75-week10-results.csv"
+             Link="TestData/1974-75-week10-results.csv"
+             CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
